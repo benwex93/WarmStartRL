@@ -1,7 +1,6 @@
 # Warm-Start Reinforcement Learning
 
-## Vanilla Warm-Start TD3
-## Confidence Constrained Learning with Positive Q-value Distance (CCL-PQD) for Warm Start Off-Policy RL
+## Confidence Constrained Learning with Positive Q-value Distance (CCL-PQD) vs. Vanilla TD3
 
 ### Usage
 The paper results can be reproduced by first creating the experts:
