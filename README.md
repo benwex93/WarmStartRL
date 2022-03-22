@@ -52,9 +52,9 @@ python main.py --env HalfCheetah-v2
 https://user-images.githubusercontent.com/17824538/159301536-799c12e5-9c15-4bb6-803a-dea994db9548.mp4
 
 <p float="left">
-  <img src="https://user-images.githubusercontent.com/17824538/159579162-c0a75a9f-a0f3-4925-aaf3-30336e3fc1b1.png" width="100" />
-  <img src="https://user-images.githubusercontent.com/17824538/159579162-c0a75a9f-a0f3-4925-aaf3-30336e3fc1b1.png" width="100" /> 
-  <img src="https://user-images.githubusercontent.com/17824538/159579162-c0a75a9f-a0f3-4925-aaf3-30336e3fc1b1.png" width="100" />
+  <img src="https://user-images.githubusercontent.com/17824538/159579162-c0a75a9f-a0f3-4925-aaf3-30336e3fc1b1.png" width="1000" />
+  <img src="https://user-images.githubusercontent.com/17824538/159579162-c0a75a9f-a0f3-4925-aaf3-30336e3fc1b1.png" width="1000" /> 
+  <img src="https://user-images.githubusercontent.com/17824538/159579162-c0a75a9f-a0f3-4925-aaf3-30336e3fc1b1.png" width="1000" />
 </p>
 
 ![Cheetah Cheetah_Confidence_Scheduled_BC vs  ExperttoTD3 vs  TD3 4000](https://user-images.githubusercontent.com/17824538/159579162-c0a75a9f-a0f3-4925-aaf3-30336e3fc1b1.png)
