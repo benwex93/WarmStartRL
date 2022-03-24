@@ -63,16 +63,16 @@ if __name__ == "__main__":
 		# +1 to account for 0 indexing. +0 on ep_timesteps since it will increment +1 even if done=True
 		print(f"Total states: {overall_states} Episode Num: {t+1} Episode T: Reward: {sum(ep_reward):.3f}")
 
-	file_name = f"episodes:_{t+1}_states:_{overall_states}"
+	# file_name = f"episodes:_{t+1}_states:_{overall_states}"
+	file_name = f"{args.env}_rollout_episodes"
 
 
 	expert_name = str(args.expert_model_dir).split('/')[-1]
-	save_location = os.path.join(f"{args.replay_buffer_dir}",f"BC_{expert_name}_{file_name}")
+	save_location = os.path.join(f"{args.replay_buffer_dir}",f"BC{expert_name}_{file_name}")
 
 	import pickle
 
 	with open(save_location, 'wb') as file_pi:
 		pickle.dump(replay_buffer, file_pi)
-
-	if args.log:
-		np.save(f"{args.replay_buffer_dir}{file_name}", evaluations)
+	# if args.log:
+	# 	np.save(f"{args.replay_buffer_dir}{file_name}", evaluations)

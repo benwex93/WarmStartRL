@@ -121,7 +121,7 @@ class TD3_BC_Constraint(object):
 			target_Q = torch.min(target_Q1, target_Q2)
 			target_Q = reward + not_done * self.discount * target_Q
 
-		# Get current Q estimates
+		# Get current Q estimate
 		current_Q1, current_Q2 = self.critic(state, action)
 
 		# Compute critic loss

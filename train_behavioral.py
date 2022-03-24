@@ -8,8 +8,6 @@ import os
 
 import utils
 import TD3
-import TD3_equalSA
-import DDPG
 from envs import init_env
 from gym.utils import seeding
 
@@ -82,8 +80,8 @@ if __name__ == "__main__":
         
 	if not os.path.exists(str(args.model_dir)):
 		os.makedirs(str(args.model_dir))
-	if not os.path.exists(str(args.results_dir)):
-		os.makedirs(str(args.results_dir))
+	# if not os.path.exists(str(args.results_dir)):
+	# 	os.makedirs(str(args.results_dir))
 
 	experiment_args = {
 		"policy": args.policy,
@@ -152,15 +150,6 @@ if __name__ == "__main__":
 		kwargs["noise_clip"] = args.noise_clip * max_action
 		kwargs["policy_freq"] = args.policy_freq
 		policy = TD3.TD3(**kwargs)
-	elif args.policy == "TD3_equalSA":
-		# Target policy smoothing is scaled wrt the action scale
-		kwargs["policy_noise"] = args.policy_noise * max_action
-		kwargs["noise_clip"] = args.noise_clip * max_action
-		kwargs["policy_freq"] = args.policy_freq
-		policy = TD3_equalSA.TD3_equalSA(**kwargs)
-	elif args.policy == "DDPG":
-		# Target policy smoothing is scaled wrt the action scale
-		policy = DDPG.DDPG(**kwargs)
 
 	replay_buffer = utils.ReplayBuffer(state_dim, action_dim)
 	

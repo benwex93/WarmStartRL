@@ -7,25 +7,12 @@ import argparse
 import os
 
 import utils
-import DDPG
 import TD3
-import TD3_fetch
-import TD3_equalSA
-import TD3C
-import TD3CCL_BC
 import TD3CCL_PQD
-import TD3C2
 import TD3_BC_Constraint
-import TD3_BC_Constraint
-import TD3_BC_Constraint_Scheduled
-import TD3_BC_Uncertainty
-import TD3_BC_Penalty
 import TD3_BC_Pertubation
 import TD3_gradient_clipping
-import TD3_Gradient_Compare
 import TD3_learning_rate
-import TD3_learning_rate_scheduled
-import TD3_warm_start
 from envs import init_env
 from gym.utils import seeding
 
@@ -185,33 +172,13 @@ if __name__ == "__main__":
 		"tau": args.tau,
 	}
 
-	if args.policy == "DDPG":
-		# Target policy smoothing is scaled wrt the action scale
-		policy = DDPG.DDPG(**kwargs)
-
-	elif args.policy == "TD3":
+	if args.policy == "TD3":
 		# Target policy smoothing is scaled wrt the action scale
 		kwargs["policy_noise"] = args.policy_noise * max_action
 		kwargs["noise_clip"] = args.noise_clip * max_action
 		kwargs["policy_freq"] = args.policy_freq
 		kwargs["load_expert_with_q"] = args.load_expert_with_q
 		policy = TD3.TD3(**kwargs)
-
-	elif args.policy == "TD3_fetch":
-		# Target policy smoothing is scaled wrt the action scale
-		kwargs["policy_noise"] = args.policy_noise * max_action
-		kwargs["noise_clip"] = args.noise_clip * max_action
-		kwargs["policy_freq"] = args.policy_freq
-		kwargs["load_expert_with_q"] = args.load_expert_with_q
-		policy = TD3_fetch.TD3_fetch(**kwargs)
-
-	elif args.policy == "TD3_equalSA":
-		# Target policy smoothing is scaled wrt the action scale
-		kwargs["policy_noise"] = args.policy_noise * max_action
-		kwargs["noise_clip"] = args.noise_clip * max_action
-		kwargs["policy_freq"] = args.policy_freq
-		kwargs["load_expert_with_q"] = args.load_expert_with_q
-		policy = TD3_equalSA.TD3_equalSA(**kwargs)
 
 	elif args.policy == "TD3_gradient_clipping":
 		# Target policy smoothing is scaled wrt the action scale
@@ -221,14 +188,6 @@ if __name__ == "__main__":
 		kwargs["gradient_clipping"] = args.gradient_clipping
 		policy = TD3_gradient_clipping.TD3_gradient_clipping(**kwargs)
 
-	elif args.policy == "TD3_Gradient_Compare":
-		# Target policy smoothing is scaled wrt the action scale
-		kwargs["policy_noise"] = args.policy_noise * max_action
-		kwargs["noise_clip"] = args.noise_clip * max_action
-		kwargs["policy_freq"] = args.policy_freq
-		kwargs["load_expert_with_q"] = args.load_expert_with_q
-		policy = TD3_Gradient_Compare.TD3_Gradient_Compare(**kwargs)
-
 	elif args.policy == "TD3_learning_rate":
 		# Target policy smoothing is scaled wrt the action scale
 		kwargs["policy_noise"] = args.policy_noise * max_action
@@ -237,28 +196,6 @@ if __name__ == "__main__":
 		kwargs["learning_rate"] = args.learning_rate
 		policy = TD3_learning_rate.TD3_learning_rate(**kwargs)
 
-	elif args.policy == "TD3_learning_rate_scheduled":
-		# Target policy smoothing is scaled wrt the action scale
-		kwargs["policy_noise"] = args.policy_noise * max_action
-		kwargs["noise_clip"] = args.noise_clip * max_action
-		kwargs["policy_freq"] = args.policy_freq
-		kwargs["learning_rate"] = args.learning_rate
-		policy = TD3_learning_rate_scheduled.TD3_learning_rate_scheduled(**kwargs)
-
-	elif args.policy == "TD3C":
-		# Target policy smoothing is scaled wrt the action scale
-		kwargs["policy_noise"] = args.policy_noise * max_action
-		kwargs["noise_clip"] = args.noise_clip * max_action
-		kwargs["policy_freq"] = args.policy_freq
-		kwargs["actor_update_rule"] = args.actor_update_rule
-		kwargs["learning_rate"] = args.learning_rate
-		policy = TD3C.TD3C(**kwargs)
-	elif args.policy == "TD3C2":
-		# Target policy smoothing is scaled wrt the action scale
-		kwargs["policy_noise"] = args.policy_noise * max_action
-		kwargs["noise_clip"] = args.noise_clip * max_action
-		kwargs["policy_freq"] = args.policy_freq
-		policy = TD3C2.TD3C2(**kwargs)
 	elif args.policy == "TD3_BC_Constraint":
 		# Target policy smoothing is scaled wrt the action scale
 		kwargs["policy_noise"] = args.policy_noise * max_action
@@ -266,23 +203,6 @@ if __name__ == "__main__":
 		kwargs["policy_freq"] = args.policy_freq
 		kwargs["alpha"] = args.alpha
 		policy = TD3_BC_Constraint.TD3_BC_Constraint(**kwargs)
-
-	elif args.policy == "TD3_BC_Constraint_Scheduled":
-		# Target policy smoothing is scaled wrt the action scale
-		kwargs["policy_noise"] = args.policy_noise * max_action
-		kwargs["noise_clip"] = args.noise_clip * max_action
-		kwargs["policy_freq"] = args.policy_freq
-		kwargs["alpha"] = args.alpha
-		policy = TD3_BC_Constraint_Scheduled.TD3_BC_Constraint_Scheduled(**kwargs)
-
-	elif args.policy == "TD3_BC_Uncertainty":
-		# Target policy smoothing is scaled wrt the action scale
-		kwargs["policy_noise"] = args.policy_noise * max_action
-		kwargs["noise_clip"] = args.noise_clip * max_action
-		kwargs["policy_freq"] = args.policy_freq
-		kwargs["alpha"] = args.alpha
-		kwargs["start_percentile"] = args.start_percentile
-		policy = TD3_BC_Uncertainty.TD3_BC_Uncertainty(**kwargs)
 
 	elif args.policy == "TD3CCL_PQD":
 		# Target policy smoothing is scaled wrt the action scale
@@ -293,15 +213,6 @@ if __name__ == "__main__":
 		kwargs["start_percentile"] = args.start_percentile
 		policy = TD3CCL_PQD.TD3CCL_PQD(**kwargs)
 
-	elif args.policy == "TD3CCL_BC":
-		# Target policy smoothing is scaled wrt the action scale
-		kwargs["policy_noise"] = args.policy_noise * max_action
-		kwargs["noise_clip"] = args.noise_clip * max_action
-		kwargs["policy_freq"] = args.policy_freq
-		kwargs["alpha"] = args.alpha
-		kwargs["start_percentile"] = args.start_percentile
-		policy = TD3CCL_BC.TD3CCL_BC(**kwargs)
-
 	elif args.policy == "TD3_BC_Pertubation":
 		# Target policy smoothing is scaled wrt the action scale
 		kwargs["policy_noise"] = args.policy_noise * max_action
@@ -309,32 +220,6 @@ if __name__ == "__main__":
 		kwargs["policy_freq"] = args.policy_freq
 		kwargs["alpha"] = args.alpha
 		policy = TD3_BC_Pertubation.TD3_BC_Pertubation(**kwargs)
-
-	elif args.policy == "TD3_BC_Penalty":
-		# Target policy smoothing is scaled wrt the action scale
-		kwargs["policy_noise"] = args.policy_noise * max_action
-		kwargs["noise_clip"] = args.noise_clip * max_action
-		kwargs["policy_freq"] = args.policy_freq
-		kwargs["alpha"] = args.alpha
-		policy = TD3_BC_Penalty.TD3_BC_Penalty(**kwargs)	
-	
-	elif args.policy == "TD3_warm_start":
-		# Target policy smoothing is scaled wrt the action scale
-		kwargs["policy_noise"] = args.policy_noise * max_action
-		kwargs["noise_clip"] = args.noise_clip * max_action
-		kwargs["policy_freq"] = args.policy_freq
-		policy = TD3_warm_start.TD3_warm_start(**kwargs)
-
-	elif args.policy == "TD3UE_Dropout":
-		# Target policy smoothing is scaled wrt the action scale
-		kwargs["policy_noise"] = args.policy_noise * max_action
-		kwargs["noise_clip"] = args.noise_clip * max_action
-		kwargs["policy_freq"] = args.policy_freq
-		kwargs["dropout_rate"] = args.dropout_rate
-		kwargs["actor_update_rule"] = args.actor_update_rule
-		kwargs["layer_width"] = args.layer_width
-		kwargs["alpha"] = args.alpha
-		policy = TD3UE_Dropout.TD3UE_Dropout(**kwargs)
 
 	if args.load_bc:
 		policy.load_policy(f'{args.bc_model}')		

@@ -2,6 +2,8 @@ from envs import DistanceWrapper, PickPlaceWrapper, init_env
 import numpy as np
 import gym
 
+# from fetch_stack_expert import FetchStackExpert
+
 #REQUIRES GYM==0.15.4!!!!
 #DOESNT WORK with gym==0.17.2
 def init_expert(env_name, expl_noise, policy_file=None):
@@ -15,6 +17,18 @@ def init_expert(env_name, expl_noise, policy_file=None):
 		expert_env = PickPlaceWrapper(expert_env)
 		expert_env._max_episode_steps = 100
 		expert = FetchPickPlaceExpert(expert_env)
+
+	elif env_name == 'FetchSlide-v1':
+		expert_env = gym.make(env_name)
+		expert_env = PickPlaceWrapper(expert_env)
+		expert_env._max_episode_steps = 100
+		expert = FetchSlideExpert(expert_env)
+
+	elif env_name == 'FetchPush-v1':
+		expert_env = gym.make(env_name)
+		expert_env = PickPlaceWrapper(expert_env)
+		expert_env._max_episode_steps = 100
+		expert = FetchPushExpert(expert_env)
 
 	elif env_name in ['FetchStack4Stage3-v1', 'FetchStack4SparseStage3-v1']:
 		expert_env = gym.make(env_name)
@@ -59,6 +73,462 @@ class FetchReachExpert():
 
 		return action
 
+class FetchSlideExpert():
+	def __init__(self, env):
+		self.env = env
+		self.env.reset()
+
+		self.state_dim = self.env.observation_space['observation'].shape[0]
+		self.action_dim = self.env.action_space.shape[0]
+		self.max_action = float(env.action_space.high[0])
+
+	def go_above_cube(self, state, ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool):
+
+		goal = state['desired_goal']
+		objectPos = state['observation'][3:6]
+		gripperPos = state['observation'][:3]
+		object_rel_pos = state['observation'][6:9]
+
+		object_oriented_goal = object_rel_pos.copy()
+		object_oriented_goal[2] += 0.12
+
+		next_state_copy = state.copy()
+		state = np.append(state['observation'], goal)
+
+		while np.linalg.norm(object_oriented_goal) >= 0.005 and self.timeStep <= self.env._max_episode_steps:
+			# self.env.render()
+			action = [0, 0, 0, 0]
+
+			object_oriented_goal = object_rel_pos.copy()
+			object_oriented_goal[2] += 0.12
+
+			for i in range(len(object_oriented_goal)):
+				action[i] = object_oriented_goal[i]*6
+
+			action = (
+				action
+				+ np.random.normal(0, self.max_action * self.expl_noise, size=self.action_dim)
+			).clip(-self.max_action, self.max_action)
+
+			next_state, reward, done, info = self.env.step(action)
+			
+			if info is False:
+				print('bad episode')
+				return None
+
+			done_bool = float(done) if self.timeStep < self.env._max_episode_steps else 0.0
+
+			objectPos = next_state['observation'][3:6]
+			gripperPos = next_state['observation'][:3]
+			object_rel_pos = next_state['observation'][6:9]
+			#set goal to correct one since loading state in mujoco only loads robot positions 
+			next_state_copy = next_state.copy()
+			next_state = np.append(next_state['observation'], goal)
+
+			ep_state.append(state)
+			ep_actions.append(action)
+			ep_next_state.append(next_state)
+			ep_reward.append(reward)
+			ep_done_bool.append(done_bool)
+
+			state = next_state
+			self.timeStep += 1
+
+		return next_state_copy
+	def go_to_side_of_cube(self, side, state, ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool):
+
+		goal = state['desired_goal']
+		objectPos = state['observation'][3:6]
+		gripperPos = state['observation'][:3]
+		object_rel_pos = state['observation'][6:9]
+
+		object_oriented_goal = object_rel_pos.copy()
+
+		if side == 'front':
+			object_oriented_goal[0] += 0.07		
+		elif side == 'back':
+			object_oriented_goal[0] -= 0.07
+		elif side == 'right':
+			object_oriented_goal[1] += 0.07
+		elif side == 'left':
+			object_oriented_goal[1] -= 0.07
+
+		next_state_copy = state.copy()
+		state = np.append(state['observation'], goal)
+
+		while np.linalg.norm(object_oriented_goal) >= 0.01 and self.timeStep <= self.env._max_episode_steps:
+			# self.env.render()
+			action = [0, 0, 0, 0]
+
+			# print(np.linalg.norm(object_oriented_goal))
+			object_oriented_goal = object_rel_pos.copy()
+			if side == 'front':
+				object_oriented_goal[0] += 0.07		
+			elif side == 'back':
+				object_oriented_goal[0] -= 0.07
+			elif side == 'right':
+				object_oriented_goal[1] += 0.07
+			elif side == 'left':
+				object_oriented_goal[1] -= 0.07
+
+			for i in range(len(object_oriented_goal)):
+				action[i] = object_oriented_goal[i]*6
+
+			action = (
+				action
+				+ np.random.normal(0, self.max_action * self.expl_noise, size=self.action_dim)
+			).clip(-self.max_action, self.max_action)
+
+			next_state, reward, done, info = self.env.step(action)
+			
+			if info is False:
+				print('bad episode')
+				return None
+
+			done_bool = float(done) if self.timeStep < self.env._max_episode_steps else 0.0
+
+			objectPos = next_state['observation'][3:6]
+			gripperPos = next_state['observation'][:3]
+			object_rel_pos = next_state['observation'][6:9]
+			#set goal to correct one since loading state in mujoco only loads robot positions 
+			next_state_copy = next_state.copy()
+			next_state = np.append(next_state['observation'], goal)
+
+			ep_state.append(state)
+			ep_actions.append(action)
+			ep_next_state.append(next_state)
+			ep_reward.append(reward)
+			ep_done_bool.append(done_bool)
+
+			state = next_state
+			self.timeStep += 1
+
+		return next_state_copy
+	def push_side_of_cube(self, side, state, ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool):
+
+		goal = state['desired_goal']
+		objectPos = state['observation'][3:6]
+		gripperPos = state['observation'][:3]
+		object_rel_pos = state['observation'][6:9]
+
+		object_oriented_goal = (goal - gripperPos).copy()
+		# object_oriented_goal = (goal - objectPos).copy()
+
+		if side == 'back' or side == 'front':
+			object_oriented_goal[1] = 0	
+		elif side == 'right' or side == 'left':
+			object_oriented_goal[0] = 0
+		object_oriented_goal[2] = 0
+
+		next_state_copy = state.copy()
+		state = np.append(state['observation'], goal)
+
+
+		while np.linalg.norm(object_oriented_goal) >= 0.01 and self.timeStep <= self.env._max_episode_steps:
+			# self.env.render()
+			action = [0, 0, 0, 0]
+			object_oriented_goal = (goal - gripperPos).copy()
+			# object_oriented_goal = (goal - objectPos).copy()
+
+			if side == 'back' or side == 'front':
+				object_oriented_goal[1] = 0		
+			elif side == 'right' or side == 'left':
+				object_oriented_goal[0] = 0
+			object_oriented_goal[2] = 0	
+
+			for i in range(len(object_oriented_goal)):
+				action[i] = object_oriented_goal[i]*6
+
+			action = (
+				action
+				+ np.random.normal(0, self.max_action * self.expl_noise, size=self.action_dim)
+			).clip(-self.max_action, self.max_action)
+
+			next_state, reward, done, info = self.env.step(action)
+			
+			if info is False:
+				print('bad episode')
+				return None
+
+			done_bool = float(done) if self.timeStep < self.env._max_episode_steps else 0.0
+
+			objectPos = next_state['observation'][3:6]
+			gripperPos = next_state['observation'][:3]
+			object_rel_pos = next_state['observation'][6:9]
+			#set goal to correct one since loading state in mujoco only loads robot positions 
+			next_state_copy = next_state.copy()
+			next_state = np.append(next_state['observation'], goal)
+
+			ep_state.append(state)
+			ep_actions.append(action)
+			ep_next_state.append(next_state)
+			ep_reward.append(reward)
+			ep_done_bool.append(done_bool)
+
+			state = next_state
+			self.timeStep += 1
+
+		return next_state_copy
+
+	def play_episode(self):
+
+		ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool = [],[],[],[],[]
+		
+		state = self.env.reset()
+		self.timeStep = 0
+
+		state = self.go_above_cube(state, ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool)
+
+		if not state:
+			return None, None, None, None, None
+
+		goal = state['desired_goal']
+		objectPos = state['observation'][3:6]
+		if (goal-objectPos)[0] > 0.01: 
+			state = self.go_to_side_of_cube('back', state, ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool)			
+			state = self.push_side_of_cube('back', state, ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool)			
+
+		ep_done_bool[-1] = 1
+		return ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool
+
+class FetchPushExpert():
+	def __init__(self, env):
+		self.env = env
+		self.env.reset()
+
+		self.state_dim = self.env.observation_space['observation'].shape[0]
+		self.action_dim = self.env.action_space.shape[0]
+		self.max_action = float(env.action_space.high[0])
+
+	def go_above_cube(self, state, ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool):
+
+		goal = state['desired_goal']
+		objectPos = state['observation'][3:6]
+		gripperPos = state['observation'][:3]
+		object_rel_pos = state['observation'][6:9]
+
+		object_oriented_goal = object_rel_pos.copy()
+		object_oriented_goal[2] += 0.12
+
+		next_state_copy = state.copy()
+		state = np.append(state['observation'], goal)
+
+		while np.linalg.norm(object_oriented_goal) >= 0.005 and self.timeStep <= self.env._max_episode_steps:
+			# self.env.render()
+			action = [0, 0, 0, 0]
+
+			object_oriented_goal = object_rel_pos.copy()
+			object_oriented_goal[2] += 0.12
+
+			for i in range(len(object_oriented_goal)):
+				action[i] = object_oriented_goal[i]*6
+
+			action = (
+				action
+				+ np.random.normal(0, self.max_action * self.expl_noise, size=self.action_dim)
+			).clip(-self.max_action, self.max_action)
+
+			next_state, reward, done, info = self.env.step(action)
+			
+			if info is False:
+				print('bad episode')
+				return None
+
+			done_bool = float(done) if self.timeStep < self.env._max_episode_steps else 0.0
+
+			objectPos = next_state['observation'][3:6]
+			gripperPos = next_state['observation'][:3]
+			object_rel_pos = next_state['observation'][6:9]
+			#set goal to correct one since loading state in mujoco only loads robot positions 
+			next_state_copy = next_state.copy()
+			next_state = np.append(next_state['observation'], goal)
+
+			ep_state.append(state)
+			ep_actions.append(action)
+			ep_next_state.append(next_state)
+			ep_reward.append(reward)
+			ep_done_bool.append(done_bool)
+
+			state = next_state
+			self.timeStep += 1
+
+		return next_state_copy
+	def go_to_side_of_cube(self, side, state, ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool):
+
+		goal = state['desired_goal']
+		objectPos = state['observation'][3:6]
+		gripperPos = state['observation'][:3]
+		object_rel_pos = state['observation'][6:9]
+
+		object_oriented_goal = object_rel_pos.copy()
+
+		if side == 'front':
+			object_oriented_goal[0] += 0.07		
+		elif side == 'back':
+			object_oriented_goal[0] -= 0.07
+		elif side == 'right':
+			object_oriented_goal[1] += 0.07
+		elif side == 'left':
+			object_oriented_goal[1] -= 0.07
+
+		next_state_copy = state.copy()
+		state = np.append(state['observation'], goal)
+
+		while np.linalg.norm(object_oriented_goal) >= 0.005 and self.timeStep <= self.env._max_episode_steps:
+			# self.env.render()
+			action = [0, 0, 0, 0]
+
+			object_oriented_goal = object_rel_pos.copy()
+			if side == 'front':
+				object_oriented_goal[0] += 0.07		
+			elif side == 'back':
+				object_oriented_goal[0] -= 0.07
+			elif side == 'right':
+				object_oriented_goal[1] += 0.07
+			elif side == 'left':
+				object_oriented_goal[1] -= 0.07
+
+			for i in range(len(object_oriented_goal)):
+				action[i] = object_oriented_goal[i]*6
+
+			action = (
+				action
+				+ np.random.normal(0, self.max_action * self.expl_noise, size=self.action_dim)
+			).clip(-self.max_action, self.max_action)
+
+			next_state, reward, done, info = self.env.step(action)
+			
+			if info is False:
+				print('bad episode')
+				return None
+
+			done_bool = float(done) if self.timeStep < self.env._max_episode_steps else 0.0
+
+			objectPos = next_state['observation'][3:6]
+			gripperPos = next_state['observation'][:3]
+			object_rel_pos = next_state['observation'][6:9]
+			#set goal to correct one since loading state in mujoco only loads robot positions 
+			next_state_copy = next_state.copy()
+			next_state = np.append(next_state['observation'], goal)
+
+			ep_state.append(state)
+			ep_actions.append(action)
+			ep_next_state.append(next_state)
+			ep_reward.append(reward)
+			ep_done_bool.append(done_bool)
+
+			state = next_state
+			self.timeStep += 1
+
+		return next_state_copy
+	def push_side_of_cube(self, side, state, ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool):
+
+		goal = state['desired_goal']
+		objectPos = state['observation'][3:6]
+		gripperPos = state['observation'][:3]
+		object_rel_pos = state['observation'][6:9]
+
+		object_oriented_goal = (goal - gripperPos).copy()
+		# object_oriented_goal = (goal - objectPos).copy()
+
+		if side == 'back' or side == 'front':
+			object_oriented_goal[1] = 0	
+		elif side == 'right' or side == 'left':
+			object_oriented_goal[0] = 0
+		object_oriented_goal[2] = 0
+
+		next_state_copy = state.copy()
+		state = np.append(state['observation'], goal)
+
+		while np.linalg.norm(object_oriented_goal) >= 0.01 and self.timeStep <= self.env._max_episode_steps:
+			# self.env.render()
+			action = [0, 0, 0, 0]
+			# print(np.linalg.norm(object_oriented_goal))
+			object_oriented_goal = (goal - gripperPos).copy()
+			# object_oriented_goal = (goal - objectPos).copy()
+
+			if side == 'back' or side == 'front':
+				object_oriented_goal[1] = 0		
+			elif side == 'right' or side == 'left':
+				object_oriented_goal[0] = 0
+			object_oriented_goal[2] = 0	
+
+			for i in range(len(object_oriented_goal)):
+				action[i] = object_oriented_goal[i]*6
+
+			action = (
+				action
+				+ np.random.normal(0, self.max_action * self.expl_noise, size=self.action_dim)
+			).clip(-self.max_action, self.max_action)
+
+			next_state, reward, done, info = self.env.step(action)
+			
+			if info is False:
+				print('bad episode')
+				return None
+
+			done_bool = float(done) if self.timeStep < self.env._max_episode_steps else 0.0
+
+			objectPos = next_state['observation'][3:6]
+			gripperPos = next_state['observation'][:3]
+			object_rel_pos = next_state['observation'][6:9]
+			#set goal to correct one since loading state in mujoco only loads robot positions 
+			next_state_copy = next_state.copy()
+			next_state = np.append(next_state['observation'], goal)
+
+			ep_state.append(state)
+			ep_actions.append(action)
+			ep_next_state.append(next_state)
+			ep_reward.append(reward)
+			ep_done_bool.append(done_bool)
+
+			state = next_state
+			self.timeStep += 1
+
+		return next_state_copy
+
+	def play_episode(self):
+
+		ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool = [],[],[],[],[]
+		
+		state = self.env.reset()
+		self.timeStep = 0
+
+		state = self.go_above_cube(state, ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool)
+
+		if not state:
+			return None, None, None, None, None
+
+		goal = state['desired_goal']
+		objectPos = state['observation'][3:6]
+		if (goal-objectPos)[0] > 0.01: 
+			state = self.go_to_side_of_cube('back', state, ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool)			
+			state = self.push_side_of_cube('back', state, ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool)			
+
+		state = self.go_above_cube(state, ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool)
+		goal = state['desired_goal']
+		objectPos = state['observation'][3:6]
+		if (goal-objectPos)[0] < -0.01:
+			state = self.go_to_side_of_cube('front', state, ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool)
+			state = self.push_side_of_cube('front', state, ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool)			
+
+		state = self.go_above_cube(state, ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool)
+		goal = state['desired_goal']
+		objectPos = state['observation'][3:6]
+		if (goal-objectPos)[1] > 0.01:
+			state = self.go_to_side_of_cube('left', state, ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool)
+			state = self.push_side_of_cube('left', state, ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool)			
+
+		state = self.go_above_cube(state, ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool)
+		goal = state['desired_goal']
+		objectPos = state['observation'][3:6]
+		if (goal-objectPos)[1] < -0.01:
+			state = self.go_to_side_of_cube('right', state, ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool)
+			state = self.push_side_of_cube('right', state, ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool)			
+
+
+		ep_done_bool[-1] = 1
+		return ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool
 
 class FetchPickPlaceExpert():
 	def __init__(self, env):
@@ -274,7 +744,6 @@ class FetchPickPlaceExpert():
 		ep_done_bool[-1] = 1
 		return ep_state, ep_actions, ep_next_state, ep_reward, ep_done_bool
 import TD3
-import DDPG
 class ClassicMujocoExpert():
 	def __init__(self, env, env_name, policy_file):
 		self.env = env
@@ -294,10 +763,6 @@ class ClassicMujocoExpert():
 
 		if 'TD3' in policy_file:
 			self.policy = TD3.TD3(**kwargs)
-			self.policy.load(f"{policy_file}")
-
-		elif 'DDPG' in policy_file:
-			self.policy = DDPG.DDPG(**kwargs)
 			self.policy.load(f"{policy_file}")
 
 		else:
@@ -341,7 +806,7 @@ class ClassicMujocoExpert():
 			state = next_state
 
 		# Store data in replay buffer
-		# print('expert reward:', sum(ep_reward))
+		print('expert reward:', sum(ep_reward))
 
 		# new_discounted_return = csil_replay_buffer.get_episode_discounted_return(ep_reward, discount_factor)
 

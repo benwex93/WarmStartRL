@@ -59,6 +59,7 @@ if __name__ == "__main__":
 	parser.add_argument("--noise_clip", default=0.5)                # Range to clip target policy noise
 	parser.add_argument("--policy_freq", default=2, type=int)       # Frequency of delayed policy updates
 	parser.add_argument("--expert_demo_file", default='')       # Frequency of delayed policy updates
+	parser.add_argument("--save_model_dir", default='')       # Frequency of delayed policy updates
 	parser.add_argument("--lr", default=0.0003, type=float)       # Frequency of delayed policy updates
 	parser.add_argument("--save_model", action="store_true")        # Save model and optimizer parameters
 	args = parser.parse_args()
@@ -119,8 +120,8 @@ if __name__ == "__main__":
 	replay_buffer = None
 	evaluations = []
 
-	if not os.path.exists('../bc_models'):
-		os.makedirs('../bc_models')
+	if not os.path.exists(args.save_model_dir):
+		os.makedirs(args.save_model_dir)
 
 	import pickle
 	with open(os.path.join(args.expert_demo_file), 'rb') as filehandler: 
@@ -141,7 +142,7 @@ if __name__ == "__main__":
 
 		expert_name = str(args.expert_demo_file).split('/')[-1]
 		if args.save_model:
-			policy.save(f"../bc_models/{expert_name}")
+			policy.save(f"{args.save_model_dir}/BC_model")
 		if args.log:
 			np.save(f"../results/{args.expert_demo_file}", evaluations)
 
