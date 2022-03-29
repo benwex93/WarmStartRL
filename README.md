@@ -4,7 +4,14 @@ If you use our code or data please cite the workshop papers [paper](https://arxi
 ### Bibtex
 
 ```
-@inproceedings{wexleranalyzing,
+@misc{alma9926712834105776,
+keywords = {Reinforcement learning -- Mathematical models},
+language = {eng},
+booktitle = {Analyzing and overcoming degradation in warm-start off-policy reinforcement learning},
+author = {Wexler, Benjamin},
+publisher = {Bar-Ilan University},
+title = {Analyzing and overcoming degradation in warm-start off-policy reinforcement learning / Benjamin Wexler},
+year = {2022},
 }
 ```
 
