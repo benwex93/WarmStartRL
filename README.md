@@ -1,7 +1,17 @@
 # Warm-Start Reinforcement Learning
 
-If you use our code or data please cite the workshop papers [paper](https://arxiv.org/abs/dummy).
-### Bibtex
+If you use our code please cite our [workshop paper](https://arxiv.org/abs/dummy) featured in Adapative and Learning Agents (ALA) 2022.
+
+### Workshop
+```
+@article{wexleranalyzing,
+  title={Analyzing and Overcoming Degradation in Warm-Start Off-Policy Reinforcement Learning},
+  author={Wexler, Benjamin and Sarafian, Elad and Kraus, Sarit}
+  booktitle={AAMAS Workshop on Adaptive and Learning Agents},
+  year={2022}
+}
+```
+### Thesis
 
 ```
 @misc{alma9926712834105776,
