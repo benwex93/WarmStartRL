@@ -1,6 +1,6 @@
 # Warm-Start Reinforcement Learning
 
-If you use our code please cite our [workshop paper]([https://ala2022.github.io/papers/ALA2022_paper_5.pdf]) featured in Adapative and Learning Agents (ALA) 2022.
+If you use our code please cite our [workshop paper](https://ala2022.github.io/papers/ALA2022_paper_5.pdf) featured in Adapative and Learning Agents (ALA) 2022.
 
 ### Workshop
 ```
