@@ -2,7 +2,7 @@
 
 If you use our code please cite either 
 
-###Conference [Paper](https://ieeexplore.ieee.org/document/9981286) featured in IEEE's 2022 International Conference on Intelligent Robots and Systems (IROS):
+### Conference [Paper](https://ieeexplore.ieee.org/document/9981286) featured in IEEE's 2022 International Conference on Intelligent Robots and Systems (IROS):
 ```
 @INPROCEEDINGS{9981286,
   author={Wexler, Benjamin and Sarafian, Elad and Kraus, Sarit},
@@ -15,7 +15,7 @@ If you use our code please cite either
   doi={10.1109/IROS47612.2022.9981286}}
 ```
 
-### Workshop [paper](https://ala2022.github.io/papers/ALA2022_paper_5.pdf) featured in Adapative and Learning Agents (ALA) 2022.
+### Workshop [Paper](https://ala2022.github.io/papers/ALA2022_paper_5.pdf) featured in Adapative and Learning Agents (ALA) 2022.
 ```
 @article{wexleranalyzing,
   title={Analyzing and Overcoming Degradation in Warm-Start Off-Policy Reinforcement Learning},
@@ -24,7 +24,7 @@ If you use our code please cite either
   year={2022}
 }
 ```
-### Thesis
+### Thesis [Paper](https://biu.primo.exlibrisgroup.com/discovery/fulldisplay?docid=alma9926712834105776&context=L&vid=972BIU_INST:972BIU&lang=en&search_scope=MyInstitution&adaptor=Local%20Search%20Engine&isFrbr=true&tab=LibraryCatalog&query=any,contains,benjamin%20wexler&sortby=date_d&facet=frbrgroupid,include,9003771405225220698&offset=0)
 
 ```
 @misc{alma9926712834105776,
