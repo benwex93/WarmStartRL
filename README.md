@@ -1,8 +1,21 @@
 # Warm-Start Reinforcement Learning
 
-If you use our code please cite our [workshop paper](https://ala2022.github.io/papers/ALA2022_paper_5.pdf) featured in Adapative and Learning Agents (ALA) 2022.
+If you use our code please cite either 
 
-### Workshop
+###Conference [Paper](https://ieeexplore.ieee.org/document/9981286) featured in IEEE's 2022 International Conference on Intelligent Robots and Systems (IROS):
+```
+@INPROCEEDINGS{9981286,
+  author={Wexler, Benjamin and Sarafian, Elad and Kraus, Sarit},
+  booktitle={2022 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)}, 
+  title={Analyzing and Overcoming Degradation in Warm-Start Reinforcement Learning}, 
+  year={2022},
+  volume={},
+  number={},
+  pages={4048-4055},
+  doi={10.1109/IROS47612.2022.9981286}}
+```
+
+### Workshop [paper](https://ala2022.github.io/papers/ALA2022_paper_5.pdf) featured in Adapative and Learning Agents (ALA) 2022.
 ```
 @article{wexleranalyzing,
   title={Analyzing and Overcoming Degradation in Warm-Start Off-Policy Reinforcement Learning},
